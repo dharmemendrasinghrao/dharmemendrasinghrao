@@ -10,7 +10,7 @@
 <script>
 if(!localStorage.getItem('clinicUser')) location.href='?page=login';
 date.value=new Date().toISOString().slice(0,10);
-function loadReport(){google.script.run.withSuccessHandler(function(r){summary.innerHTML=`<div class='card'>Total: <b>${r.summary.total}</b></div><div class='card'>Waiting: <b>${r.summary.waiting}</b></div><div class='card'>Serving: <b>${r.summary.serving}</b></div><div class='card'>Completed: <b>${r.summary.completed}</b></div><div class='card'>Skipped: <b>${r.summary.skipped}</b></div>`;tbody.innerHTML='';r.queue.forEach(q=>tbody.innerHTML+=`<tr><td>${q.tokenNo}</td><td>${q.patientName}</td><td>${q.doctor}</td><td>${q.status}</td><td>${q.notes||''}</td></tr>`);}).getReports(date.value);}
+function loadReport(){google.script.run.withSuccessHandler(function(r){summary.innerHTML=`<div class='card'>Total: <b>${r.summary.total}</b></div><div class='card'>Waiting: <b>${r.summary.waiting}</b></div><div class='card'>Serving: <b>${r.summary.serving}</b></div><div class='card'>Completed: <b>${r.summary.completed}</b></div><div class='card'>Skipped: <b>${r.summary.skipped}</b></div>`;tbody.innerHTML='';r.queue.forEach(q=>tbody.innerHTML+=`<tr><td>${q.tokenNo}</td><td>${q.patientName}</td><td>${q.doctor}</td><td>${q.status}</td><td>${q.notes||''}</td></tr>`);}).getReports(date.value, JSON.parse(localStorage.getItem('clinicUser')||'null').email);}
 loadReport();
 </script>
 </body></html>

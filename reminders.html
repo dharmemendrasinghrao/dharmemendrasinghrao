@@ -17,7 +17,7 @@
 <table><thead><tr><th>Time</th><th>Patient</th><th>Phone</th><th>Status</th><th>Message</th></tr></thead><tbody id='tbody'></tbody></table>
 <script>
 const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user)location.href='?page=login';
-function loadLogs(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.timestamp}</td><td>${r.patientName}</td><td>${r.phone}</td><td class='${r.status}'>${r.status}</td><td>${r.message}</td></tr>`)}).getReminders(100);}
+function loadLogs(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.timestamp}</td><td>${r.patientName}</td><td>${r.phone}</td><td class='${r.status}'>${r.status}</td><td>${r.message}</td></tr>`)}).getReminders(100,user.email);}
 function sendReminder(){const payload={patientName:patientName.value,phone:phone.value,appointmentId:appointmentId.value,appointmentTime:appointmentTime.value,message:message.value,actor:user.email};google.script.run.withSuccessHandler(function(r){msg.textContent='Reminder '+r.status;loadLogs();}).triggerReminder(payload);}
 loadLogs();
 </script>

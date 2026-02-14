@@ -26,7 +26,7 @@ input,select,button{width:100%;padding:9px;margin:5px 0;border:1px solid #d1d5db
 <script>
 const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user)window.location.href='?page=login';
 document.getElementById('date').value=new Date().toISOString().slice(0,10);
-function load(){google.script.run.withSuccessHandler(function(data){const b=document.getElementById('tbody');b.innerHTML='';data.forEach(r=>b.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.phone}</td><td>${r.appointmentTime}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td></tr>`)}).getAppointmentsByDate(document.getElementById('date').value);}
+function load(){google.script.run.withSuccessHandler(function(data){const b=document.getElementById('tbody');b.innerHTML='';data.forEach(r=>b.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.phone}</td><td>${r.appointmentTime}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td></tr>`)}).getAppointmentsByDate(document.getElementById('date').value,user.email);}
 function saveAppointment(){
 const payload={patientName:patientName.value.trim(),phone:phone.value.trim(),date:date.value,appointmentTime:appointmentTime.value,doctor:doctor.value.trim(),actor:user.email};
 google.script.run.withSuccessHandler(function(res){msg.textContent=res.message || (res.success?'Saved':'Failed');if(res.success){msg.innerHTML=`✅ Token #${res.tokenNo} created`;patientName.value='';phone.value='';appointmentTime.value='';doctor.value='';load();}})

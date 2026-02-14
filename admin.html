@@ -22,9 +22,9 @@
 const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user||user.role!=='Admin'){alert('Admin only page');location.href='?page=dashboard';}
 function loadSettings(){google.script.run.withSuccessHandler(function(s){clinicName.value=s.clinicName||'';clinicLogo.value=s.clinicLogo||'';welcomeMessage.value=s.welcomeMessage||'';primaryColor.value=s.primaryColor||'';}).getSettingsObject();}
 function saveSettings(){google.script.run.withSuccessHandler(()=>alert('Settings saved')).updateSettings({clinicName:clinicName.value,clinicLogo:clinicLogo.value,welcomeMessage:welcomeMessage.value,primaryColor:primaryColor.value},user.email);}
-function loadUsers(){google.script.run.withSuccessHandler(function(data){users.innerHTML='';data.forEach(u=>users.innerHTML+=`<tr><td>${u.email}</td><td>${u.name}</td><td>${u.role}</td><td>${u.isActive}</td></tr>`);}).getUsers();}
+function loadUsers(){google.script.run.withSuccessHandler(function(data){users.innerHTML='';data.forEach(u=>users.innerHTML+=`<tr><td>${u.email}</td><td>${u.name}</td><td>${u.role}</td><td>${u.isActive}</td></tr>`);}).getUsers(user.email);}
 function saveUser(){google.script.run.withSuccessHandler(()=>{alert('User saved');loadUsers();}).addOrUpdateUser({email:uEmail.value,name:uName.value,role:uRole.value,password:uPassword.value,isActive:uActive.value},user.email);}
-function loadLogs(){google.script.run.withSuccessHandler(function(data){logs.innerHTML='';data.forEach(l=>logs.innerHTML+=`<tr><td>${l.timestamp}</td><td>${l.actor}</td><td>${l.action}</td><td>${l.entity}</td><td>${l.details}</td></tr>`);}).getActivityLogs(60);}
+function loadLogs(){google.script.run.withSuccessHandler(function(data){logs.innerHTML='';data.forEach(l=>logs.innerHTML+=`<tr><td>${l.timestamp}</td><td>${l.actor}</td><td>${l.action}</td><td>${l.entity}</td><td>${l.details}</td></tr>`);}).getActivityLogs(60,user.email);}
 loadSettings();loadUsers();loadLogs();
 </script>
 </body></html>

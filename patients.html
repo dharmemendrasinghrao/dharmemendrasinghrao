@@ -9,8 +9,8 @@
 <h3>Visit History</h3><pre id='historyBox'>Select a patient to view history.</pre>
 <script>
 if(!localStorage.getItem('clinicUser')) location.href='?page=login';
-function loadPatients(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.patientId}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.visitCount}</td><td>${r.lastVisitDate}</td><td><span class='link' onclick='viewHistory("${r.phone}")'>View</span></td></tr>`)}).getPatients(search.value);}
-function viewHistory(phone){google.script.run.withSuccessHandler(function(h){historyBox.textContent=JSON.stringify(h,null,2);}).getPatientVisitHistory(phone);}
+function loadPatients(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.patientId}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.visitCount}</td><td>${r.lastVisitDate}</td><td><span class='link' onclick='viewHistory("${r.phone}")'>View</span></td></tr>`)}).getPatients(search.value, JSON.parse(localStorage.getItem('clinicUser')||'null').email);}
+function viewHistory(phone){google.script.run.withSuccessHandler(function(h){historyBox.textContent=JSON.stringify(h,null,2);}).getPatientVisitHistory(phone, JSON.parse(localStorage.getItem('clinicUser')||'null').email);}
 loadPatients();
 </script>
 </body></html>

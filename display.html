@@ -26,7 +26,6 @@ function refresh(){
   if(!d.nextWaiting || !d.nextWaiting.length) waitingList.innerHTML='<div class="item">No waiting tokens</div>';
  }).withFailureHandler(function(){document.getElementById('meta').textContent='Reconnecting... Please wait.';}).getQueueDisplayData();
 }
-google.script.run.withSuccessHandler(s=>title.textContent=s.clinicName+' - Live Queue Display').getSettingsObject();
-refresh();setInterval(refresh,3000);
+let loop=3000;google.script.run.withSuccessHandler(function(s){title.textContent=s.clinicName+' - Live Queue Display';loop=(Number(s.displayRefreshSeconds||3))*1000;refresh();setInterval(refresh,loop);}).getSettingsObject();
 </script>
 </body></html>

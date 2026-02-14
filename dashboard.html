@@ -47,7 +47,7 @@ function loadStats(){google.script.run.withSuccessHandler(function(s){
   <div class='card'><b>${s.skipped}</b><div>Skipped</div></div>`;
   const tbody=document.getElementById('summary');tbody.innerHTML='';
   (s.liveQueueSummary||[]).forEach(r=>{tbody.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td></tr>`});
- }).getDashboardStats();}
+ }).getDashboardStats(user.email);}
 function logout(){localStorage.removeItem('clinicUser');window.location.href='?page=login';}
 if(guard()){renderNav();loadStats();setInterval(loadStats,5000);google.script.run.withSuccessHandler(s=>document.getElementById('title').textContent=s.clinicName+' Dashboard').getSettingsObject();}
 </script>
