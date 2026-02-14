@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Queue Management</title>
+<style>
+body{font-family:Arial;background:#f8fafc;margin:18px}button{padding:10px 12px;border:none;border-radius:8px;cursor:pointer;margin-right:8px}
+.primary{background:#2563eb;color:#fff}.ok{background:#16a34a;color:#fff}.warn{background:#dc2626;color:#fff}
+table{width:100%;margin-top:10px;border-collapse:collapse;background:#fff}th,td{border:1px solid #e5e7eb;padding:7px}
+.status{padding:3px 8px;border-radius:8px}.WAITING{background:#fde68a}.SERVING{background:#93c5fd}.COMPLETED{background:#86efac}.SKIPPED{background:#fca5a5}
+</style></head>
+<body>
+<div><a href='?page=dashboard'>Dashboard</a> | <a href='?page=display'>Display</a></div>
+<h2>Token Queue Control</h2>
+<div>
+<button class='primary' onclick='callNext()'>Call Next Patient</button>
+<input id='tokenNo' type='number' placeholder='Token no'>
+<button class='ok' onclick='completeCurrent()'>Complete</button>
+<button class='warn' onclick='skipCurrent()'>Skip</button>
+<span id='msg'></span>
+</div>
+<table><thead><tr><th>Token</th><th>Name</th><th>Doctor</th><th>Status</th><th>Serve Time</th><th>Complete Time</th></tr></thead><tbody id='tbody'></tbody></table>
+<script>
+const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user)location.href='?page=login';
+function loadQueue(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td><td>${r.serveTime||''}</td><td>${r.completeTime||''}</td></tr>`);const s=rows.find(x=>x.status==='SERVING');if(s)tokenNo.value=s.tokenNo;}).getQueueData();}
+function callNext(){google.script.run.withSuccessHandler(r=>{msg.textContent=r.message;loadQueue();}).callNextPatient(user.email);}
+function completeCurrent(){google.script.run.withSuccessHandler(r=>{msg.textContent=r.success?'Completed':'Failed';loadQueue();}).completePatient(Number(tokenNo.value),user.email,'Consultation completed');}
+function skipCurrent(){google.script.run.withSuccessHandler(r=>{msg.textContent=r.success?'Skipped':'Failed';loadQueue();}).skipPatient(Number(tokenNo.value),user.email,'No show / skipped');}
+loadQueue();setInterval(loadQueue,5000);
+</script>
+</body></html>

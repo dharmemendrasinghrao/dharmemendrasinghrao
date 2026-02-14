@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin</title>
+<style>body{font-family:Arial;background:#f8fafc;margin:18px}section{background:#fff;padding:12px;border-radius:10px;margin-bottom:12px}input,select,button{padding:8px;margin:4px;width:100%}table{width:100%;border-collapse:collapse}th,td{border:1px solid #e5e7eb;padding:7px}</style>
+</head><body>
+<div><a href='?page=dashboard'>Dashboard</a></div>
+<h2>Admin Panel</h2>
+<section>
+<h3>Clinic Branding Settings</h3>
+<input id='clinicName' placeholder='Clinic Name'><input id='clinicLogo' placeholder='Clinic Logo URL'><input id='welcomeMessage' placeholder='Welcome Message'><input id='primaryColor' placeholder='Primary Color (#0f766e)'>
+<button onclick='saveSettings()'>Save Settings</button>
+</section>
+<section>
+<h3>User Management</h3>
+<input id='uEmail' placeholder='Email'><input id='uName' placeholder='Name'><select id='uRole'><option>Admin</option><option>Reception</option><option>Doctor</option></select><input id='uPassword' placeholder='Password'><select id='uActive'><option>YES</option><option>NO</option></select><button onclick='saveUser()'>Add / Update User</button>
+<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Active</th></tr></thead><tbody id='users'></tbody></table>
+</section>
+<section>
+<h3>Recent Activity Logs</h3>
+<table><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead><tbody id='logs'></tbody></table>
+</section>
+<script>
+const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user||user.role!=='Admin'){alert('Admin only page');location.href='?page=dashboard';}
+function loadSettings(){google.script.run.withSuccessHandler(function(s){clinicName.value=s.clinicName||'';clinicLogo.value=s.clinicLogo||'';welcomeMessage.value=s.welcomeMessage||'';primaryColor.value=s.primaryColor||'';}).getSettingsObject();}
+function saveSettings(){google.script.run.withSuccessHandler(()=>alert('Settings saved')).updateSettings({clinicName:clinicName.value,clinicLogo:clinicLogo.value,welcomeMessage:welcomeMessage.value,primaryColor:primaryColor.value},user.email);}
+function loadUsers(){google.script.run.withSuccessHandler(function(data){users.innerHTML='';data.forEach(u=>users.innerHTML+=`<tr><td>${u.email}</td><td>${u.name}</td><td>${u.role}</td><td>${u.isActive}</td></tr>`);}).getUsers();}
+function saveUser(){google.script.run.withSuccessHandler(()=>{alert('User saved');loadUsers();}).addOrUpdateUser({email:uEmail.value,name:uName.value,role:uRole.value,password:uPassword.value,isActive:uActive.value},user.email);}
+function loadLogs(){google.script.run.withSuccessHandler(function(data){logs.innerHTML='';data.forEach(l=>logs.innerHTML+=`<tr><td>${l.timestamp}</td><td>${l.actor}</td><td>${l.action}</td><td>${l.entity}</td><td>${l.details}</td></tr>`);}).getActivityLogs(60);}
+loadSettings();loadUsers();loadLogs();
+</script>
+</body></html>

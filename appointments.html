@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Appointments</title>
+<style>
+body{font-family:Arial;margin:18px;background:#f8fafc}a{margin-right:10px}
+.wrap{display:grid;grid-template-columns:330px 1fr;gap:14px}.box{background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+input,select,button{width:100%;padding:9px;margin:5px 0;border:1px solid #d1d5db;border-radius:7px}button{background:#0f766e;color:#fff;border:none}
+ table{width:100%;border-collapse:collapse}th,td{border:1px solid #e5e7eb;padding:6px}.status{padding:3px 6px;border-radius:8px}.WAITING{background:#fde68a}.SERVING{background:#93c5fd}.COMPLETED{background:#86efac}.SKIPPED{background:#fca5a5}
+</style></head>
+<body>
+<div><a href='?page=dashboard'>Dashboard</a><a href='?page=queue'>Queue</a><a href='?page=login' onclick='localStorage.removeItem("clinicUser")'>Logout</a></div>
+<h2>Appointment Booking</h2>
+<div class="wrap">
+<div class="box">
+<input id="patientName" placeholder="Patient name">
+<input id="phone" placeholder="Phone">
+<input id="date" type="date">
+<input id="appointmentTime" type="time">
+<input id="doctor" placeholder="Doctor name">
+<button onclick="saveAppointment()">Create Appointment & Generate Token</button>
+<div id="msg"></div>
+</div>
+<div class="box">
+<table><thead><tr><th>Token</th><th>Name</th><th>Phone</th><th>Time</th><th>Doctor</th><th>Status</th></tr></thead><tbody id="tbody"></tbody></table>
+</div>
+</div>
+<script>
+const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user)window.location.href='?page=login';
+document.getElementById('date').value=new Date().toISOString().slice(0,10);
+function load(){google.script.run.withSuccessHandler(function(data){const b=document.getElementById('tbody');b.innerHTML='';data.forEach(r=>b.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.phone}</td><td>${r.appointmentTime}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td></tr>`)}).getAppointmentsByDate(document.getElementById('date').value);}
+function saveAppointment(){
+const payload={patientName:patientName.value.trim(),phone:phone.value.trim(),date:date.value,appointmentTime:appointmentTime.value,doctor:doctor.value.trim(),actor:user.email};
+google.script.run.withSuccessHandler(function(res){msg.textContent=res.message || (res.success?'Saved':'Failed');if(res.success){msg.innerHTML=`✅ Token #${res.tokenNo} created`;patientName.value='';phone.value='';appointmentTime.value='';doctor.value='';load();}})
+.withFailureHandler(err=>msg.textContent=err.message).addAppointment(payload);
+}
+date.onchange=load;load();
+</script>
+</body></html>

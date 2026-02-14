@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body{font-family:Arial;background:#f4f7fb;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
+    .box{background:#fff;padding:28px;border-radius:12px;width:340px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    input,button{width:100%;padding:11px;margin:7px 0;border-radius:8px;border:1px solid #d1d5db}
+    button{background:#0f766e;color:#fff;border:none;cursor:pointer}
+    .hint{font-size:12px;color:#6b7280}
+    .error{color:#dc2626;font-size:13px;min-height:18px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Clinic Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="error" id="error"></div>
+    <p class="hint">Default users: admin@clinic.com / reception@clinic.com / doctor@clinic.com</p>
+  </div>
+  <script>
+    function login(){
+      const email=document.getElementById('email').value.trim();
+      const password=document.getElementById('password').value;
+      google.script.run.withSuccessHandler(function(res){
+        if(!res.success){document.getElementById('error').textContent=res.message;return;}
+        localStorage.setItem('clinicUser', JSON.stringify(res.user));
+        window.location.href='?page=dashboard';
+      }).loginUser(email,password);
+    }
+  </script>
+</body>
+</html>

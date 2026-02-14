@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Live Waiting Display</title>
+<style>
+body{font-family:Arial;margin:0;background:#0f172a;color:#e2e8f0}
+.head{padding:16px;text-align:center;background:#1e293b}
+.current{margin:18px auto;padding:24px;background:#1d4ed8;border-radius:16px;max-width:680px;text-align:center;animation:pulse 1.5s infinite}
+.current .token{font-size:64px;font-weight:700}
+.next{max-width:780px;margin:10px auto 20px;background:#111827;border-radius:12px;padding:14px}
+.item{display:flex;justify-content:space-between;border-bottom:1px solid #374151;padding:8px 2px}
+.small{font-size:12px;color:#94a3b8;text-align:center}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+</style></head>
+<body>
+<div class='head'><h1 id='title'>Live Queue</h1></div>
+<div class='current'><div>NOW SERVING</div><div class='token' id='servingToken'>--</div><div id='servingName'>Waiting for next patient</div></div>
+<div class='next'><h3>Next Tokens</h3><div id='waitingList'></div></div>
+<div class='small' id='meta'>Connecting...</div>
+<script>
+function refresh(){
+ google.script.run.withSuccessHandler(function(d){
+  document.getElementById('meta').textContent='Last update: '+d.lastUpdated;
+  if(d.currentServing){servingToken.textContent='T-'+d.currentServing.tokenNo;servingName.textContent=d.currentServing.patientName+' • Dr. '+d.currentServing.doctor;}
+  else{servingToken.textContent='--';servingName.textContent=d.isEmpty?'No patients in queue':'Please wait';}
+  waitingList.innerHTML='';
+  (d.nextWaiting||[]).forEach(w=>waitingList.innerHTML+=`<div class='item'><span>T-${w.tokenNo} ${w.patientName}</span><span>${w.appointmentTime}</span></div>`);
+  if(!d.nextWaiting || !d.nextWaiting.length) waitingList.innerHTML='<div class="item">No waiting tokens</div>';
+ }).withFailureHandler(function(){document.getElementById('meta').textContent='Reconnecting... Please wait.';}).getQueueDisplayData();
+}
+google.script.run.withSuccessHandler(s=>title.textContent=s.clinicName+' - Live Queue Display').getSettingsObject();
+refresh();setInterval(refresh,3000);
+</script>
+</body></html>

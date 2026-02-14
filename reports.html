@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reports</title>
+<style>body{font-family:Arial;background:#f8fafc;margin:18px}.cards{display:flex;gap:10px;flex-wrap:wrap}.card{background:#fff;padding:12px;border-radius:10px;min-width:120px}table{width:100%;border-collapse:collapse;background:#fff;margin-top:10px}th,td{border:1px solid #e5e7eb;padding:7px}</style>
+</head><body>
+<div><a href='?page=dashboard'>Dashboard</a></div>
+<h2>Daily Reports</h2>
+<input type='date' id='date'><button onclick='loadReport()'>Load Report</button>
+<div class='cards' id='summary'></div>
+<table><thead><tr><th>Token</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Notes</th></tr></thead><tbody id='tbody'></tbody></table>
+<script>
+if(!localStorage.getItem('clinicUser')) location.href='?page=login';
+date.value=new Date().toISOString().slice(0,10);
+function loadReport(){google.script.run.withSuccessHandler(function(r){summary.innerHTML=`<div class='card'>Total: <b>${r.summary.total}</b></div><div class='card'>Waiting: <b>${r.summary.waiting}</b></div><div class='card'>Serving: <b>${r.summary.serving}</b></div><div class='card'>Completed: <b>${r.summary.completed}</b></div><div class='card'>Skipped: <b>${r.summary.skipped}</b></div>`;tbody.innerHTML='';r.queue.forEach(q=>tbody.innerHTML+=`<tr><td>${q.tokenNo}</td><td>${q.patientName}</td><td>${q.doctor}</td><td>${q.status}</td><td>${q.notes||''}</td></tr>`);}).getReports(date.value);}
+loadReport();
+</script>
+</body></html>

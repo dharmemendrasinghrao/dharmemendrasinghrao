@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reminders</title>
+<style>body{font-family:Arial;background:#f8fafc;margin:18px}input,textarea,button{width:100%;padding:8px;margin:5px 0}table{width:100%;border-collapse:collapse;background:#fff}th,td{border:1px solid #e5e7eb;padding:7px}.Sent{background:#86efac}.Scheduled{background:#fde68a}.Failed{background:#fca5a5}</style>
+</head><body>
+<div><a href='?page=dashboard'>Dashboard</a></div>
+<h2>WhatsApp Reminder Simulation</h2>
+<div style='background:#fff;padding:12px;border-radius:10px'>
+<input id='patientName' placeholder='Patient Name'>
+<input id='phone' placeholder='Phone'>
+<input id='appointmentId' placeholder='Appointment ID (optional)'>
+<input id='appointmentTime' placeholder='Appointment Time'>
+<textarea id='message' placeholder='Custom message (optional)'></textarea>
+<button onclick='sendReminder()'>Trigger Reminder</button>
+<div id='msg'></div>
+</div>
+<h3>Reminder Log</h3>
+<table><thead><tr><th>Time</th><th>Patient</th><th>Phone</th><th>Status</th><th>Message</th></tr></thead><tbody id='tbody'></tbody></table>
+<script>
+const user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user)location.href='?page=login';
+function loadLogs(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.timestamp}</td><td>${r.patientName}</td><td>${r.phone}</td><td class='${r.status}'>${r.status}</td><td>${r.message}</td></tr>`)}).getReminders(100);}
+function sendReminder(){const payload={patientName:patientName.value,phone:phone.value,appointmentId:appointmentId.value,appointmentTime:appointmentTime.value,message:message.value,actor:user.email};google.script.run.withSuccessHandler(function(r){msg.textContent='Reminder '+r.status;loadLogs();}).triggerReminder(payload);}
+loadLogs();
+</script>
+</body></html>

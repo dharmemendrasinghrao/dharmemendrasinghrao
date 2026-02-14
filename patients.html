@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Patients CRM</title>
+<style>body{font-family:Arial;margin:18px;background:#f8fafc}input{padding:8px;width:280px}table{width:100%;border-collapse:collapse;background:#fff;margin-top:10px}th,td{border:1px solid #e5e7eb;padding:7px}.link{color:#2563eb;cursor:pointer}</style>
+</head><body>
+<div><a href='?page=dashboard'>Dashboard</a></div>
+<h2>Patient CRM</h2>
+<input id='search' placeholder='Search by name or phone'><button onclick='loadPatients()'>Search</button>
+<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Visits</th><th>Last Visit</th><th>History</th></tr></thead><tbody id='tbody'></tbody></table>
+<h3>Visit History</h3><pre id='historyBox'>Select a patient to view history.</pre>
+<script>
+if(!localStorage.getItem('clinicUser')) location.href='?page=login';
+function loadPatients(){google.script.run.withSuccessHandler(function(rows){tbody.innerHTML='';rows.forEach(r=>tbody.innerHTML+=`<tr><td>${r.patientId}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.visitCount}</td><td>${r.lastVisitDate}</td><td><span class='link' onclick='viewHistory("${r.phone}")'>View</span></td></tr>`)}).getPatients(search.value);}
+function viewHistory(phone){google.script.run.withSuccessHandler(function(h){historyBox.textContent=JSON.stringify(h,null,2);}).getPatientVisitHistory(phone);}
+loadPatients();
+</script>
+</body></html>

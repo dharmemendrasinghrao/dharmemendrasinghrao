@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body{font-family:Arial;margin:0;background:#f8fafc}
+    .top{display:flex;justify-content:space-between;align-items:center;background:#0f766e;color:#fff;padding:12px 18px}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 52px)}
+    .nav{background:#134e4a;padding:14px}
+    .nav a{display:block;color:#e6fffa;text-decoration:none;padding:9px;border-radius:6px;margin:4px 0}
+    .nav a:hover{background:#0f766e}
+    .main{padding:20px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+    .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    table{width:100%;border-collapse:collapse;background:#fff;margin-top:14px}
+    th,td{border:1px solid #e5e7eb;padding:8px;text-align:left}
+    .status{padding:4px 8px;border-radius:10px;color:#111827;font-size:12px}
+    .WAITING{background:#fde68a}.SERVING{background:#93c5fd}.COMPLETED{background:#86efac}.SKIPPED{background:#fca5a5}
+  </style>
+</head>
+<body>
+  <div class="top"><div id="title">Clinic Dashboard</div><div><span id="userInfo"></span> <button onclick="logout()">Logout</button></div></div>
+  <div class="layout">
+    <div class="nav" id="nav"></div>
+    <div class="main">
+      <h2>Live Dashboard</h2>
+      <div class="cards" id="cards"></div>
+      <h3>Live Queue Summary</h3>
+      <table><thead><tr><th>Token</th><th>Patient</th><th>Doctor</th><th>Status</th></tr></thead><tbody id="summary"></tbody></table>
+    </div>
+  </div>
+<script>
+const links=[['dashboard','Dashboard'],['appointments','Appointments'],['queue','Queue'],['display','Live Display'],['patients','Patients CRM'],['reminders','Reminders'],['reports','Reports'],['admin','Admin']];
+let user;
+function roleAllowed(page){if(user.role==='Admin')return true;if(user.role==='Reception')return page!=='admin';if(user.role==='Doctor')return ['dashboard','queue','display','patients','reports'].includes(page);return false;}
+function renderNav(){const nav=document.getElementById('nav');nav.innerHTML='';links.forEach(l=>{if(roleAllowed(l[0]))nav.innerHTML+=`<a href="?page=${l[0]}">${l[1]}</a>`;});}
+function guard(){user=JSON.parse(localStorage.getItem('clinicUser')||'null');if(!user){window.location.href='?page=login';return false;}document.getElementById('userInfo').textContent=user.name+' ('+user.role+')';return true;}
+function loadStats(){google.script.run.withSuccessHandler(function(s){
+  document.getElementById('cards').innerHTML=`
+  <div class='card'><b>${s.todaysAppointments}</b><div>Today's Appointments</div></div>
+  <div class='card'><b>${s.activeQueue}</b><div>Active Queue</div></div>
+  <div class='card'><b>${s.completed}</b><div>Completed</div></div>
+  <div class='card'><b>${s.waiting}</b><div>Waiting</div></div>
+  <div class='card'><b>${s.serving}</b><div>Serving</div></div>
+  <div class='card'><b>${s.skipped}</b><div>Skipped</div></div>`;
+  const tbody=document.getElementById('summary');tbody.innerHTML='';
+  (s.liveQueueSummary||[]).forEach(r=>{tbody.innerHTML+=`<tr><td>${r.tokenNo}</td><td>${r.patientName}</td><td>${r.doctor}</td><td><span class='status ${r.status}'>${r.status}</span></td></tr>`});
+ }).getDashboardStats();}
+function logout(){localStorage.removeItem('clinicUser');window.location.href='?page=login';}
+if(guard()){renderNav();loadStats();setInterval(loadStats,5000);google.script.run.withSuccessHandler(s=>document.getElementById('title').textContent=s.clinicName+' Dashboard').getSettingsObject();}
+</script>
+</body>
+</html>
