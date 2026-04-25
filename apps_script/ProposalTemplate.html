@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        color: #0f172a;
+        margin: 24px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #0ea5e9;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+      }
+      .brand {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 12px;
+      }
+      .section {
+        margin-top: 20px;
+      }
+      .section h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        border-left: 4px solid #0ea5e9;
+        padding-left: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      th,
+      td {
+        border: 1px solid #cbd5e1;
+        padding: 8px;
+        font-size: 12px;
+        text-align: left;
+      }
+      th {
+        background: #e2e8f0;
+      }
+      .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .card {
+        width: 31%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px;
+        box-sizing: border-box;
+        background: #f8fafc;
+      }
+      .card .label {
+        font-size: 11px;
+        color: #475569;
+      }
+      .card .value {
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 11px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div>
+        <div class="brand">Hybrid Solar + Wind Proposal</div>
+        <div class="muted">Project Code: <?= data.client.projectCode ?></div>
+      </div>
+      <div class="muted">Generated: <?= data.generatedAt ?></div>
+    </div>
+
+    <div class="section">
+      <h3>Client Details</h3>
+      <table>
+        <tr><th>Client Name</th><td><?= data.client.name ?></td></tr>
+        <tr><th>Email</th><td><?= data.client.email ?></td></tr>
+        <tr><th>Location</th><td><?= data.client.location ?></td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>System Design Summary</h3>
+      <div class="cards">
+        <div class="card"><div class="label">Solar Capacity</div><div class="value"><?= formatNumber(data.system.solarKw) ?> kW</div></div>
+        <div class="card"><div class="label">Wind Capacity</div><div class="value"><?= formatNumber(data.system.windKw) ?> kW</div></div>
+        <div class="card"><div class="label">Hybrid Capacity</div><div class="value"><?= formatNumber(data.system.hybridKw) ?> kW</div></div>
+        <div class="card"><div class="label">Daily Generation</div><div class="value"><?= formatNumber(data.system.dailyGeneration) ?> kWh</div></div>
+        <div class="card"><div class="label">Annual Generation</div><div class="value"><?= formatNumber(data.system.annualGeneration) ?> kWh</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Financial Highlights</h3>
+      <div class="cards">
+        <div class="card"><div class="label">Annual Savings</div><div class="value"><?= formatCurrency(data.financial.annualSavings) ?></div></div>
+        <div class="card"><div class="label">Gross Project Cost</div><div class="value"><?= formatCurrency(data.financial.grossProjectCost) ?></div></div>
+        <div class="card"><div class="label">Net Project Cost</div><div class="value"><?= formatCurrency(data.financial.netProjectCost) ?></div></div>
+        <div class="card"><div class="label">Depreciation Benefit (Year-1)</div><div class="value"><?= formatCurrency(data.financial.depreciationBenefit) ?></div></div>
+        <div class="card"><div class="label">Simple ROI</div><div class="value"><?= formatNumber(data.financial.roi) ?>%</div></div>
+        <div class="card"><div class="label">Payback</div><div class="value"><?= formatNumber(data.financial.payback) ?> Years</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Monthly Projection</h3>
+      <table>
+        <tr>
+          <th>Month</th>
+          <th>Consumption (kWh)</th>
+          <th>Generation (kWh)</th>
+          <th>Savings (₹)</th>
+          <th>Coverage (%)</th>
+        </tr>
+        <? for (var i = 0; i < data.monthlyRows.length; i++) { ?>
+          <tr>
+            <td><?= data.monthlyRows[i][0] ?></td>
+            <td><?= formatNumber(data.monthlyRows[i][1]) ?></td>
+            <td><?= formatNumber(data.monthlyRows[i][2]) ?></td>
+            <td><?= formatCurrency(data.monthlyRows[i][3]) ?></td>
+            <td><?= formatNumber(data.monthlyRows[i][4]) ?></td>
+          </tr>
+        <? } ?>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>Consultant Notes</h3>
+      <table>
+        <tr><td><?= data.notes ?></td></tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      This proposal is estimate-based and should be validated via site survey, DISCOM policy, and OEM datasheets.
+    </div>
+  </body>
+</html>
